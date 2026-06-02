@@ -88,6 +88,19 @@
                         </select>
                     </div>
                     <div class="filter-group">
+                        <label for="search">🔎 Search (USN or Name)</label>
+                        <input id="search" name="search" type="text" placeholder="Enter USN or name" value="{{ search or '' }}">
+                    </div>
+                    <div class="filter-group">
+                        <label for="subject">📚 Subject</label>
+                        <select id="subject" name="subject">
+                            <option value="">All subjects</option>
+                            {% for subj in available_subjects %}
+                            <option value="{{ subj }}" {% if subj == subject_selected %}selected{% endif %}>{{ subj.title() }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
                         <label for="rank_style">📌 Rank Style</label>
                         <select id="rank_style" name="rank_style">
                             <option value="standard" {% if rank_style == 'standard' %}selected{% endif %}>Standard (1,2,2,4)</option>
@@ -106,6 +119,12 @@
             {% if filters_applied %}
             <div class="selection-summary">
                 <p>Showing records for <strong>Semester {{ semester_selected }}</strong>, <strong>{{ exam_selected }}</strong>, <strong>{{ branch_selected }}</strong>, <strong>{{ year_selected }}</strong>. <strong>{{ total_records }}</strong> students found.</p>
+                {% if search %}
+                <p>🔎 <strong>Search</strong>: {{ search }}</p>
+                {% endif %}
+                {% if subject_selected %}
+                <p>📚 <strong>Subject filter</strong>: {{ subject_selected.title() }}</p>
+                {% endif %}
             </div>
             {% endif %}
 
