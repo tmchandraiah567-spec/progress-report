@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div id="particles-js"></div>
+    
+    <div class="container">
+        <div class="card animate-fade">
+            <h1>🎓 Student Management System</h1>
+            <p class="subtitle">Manage student records efficiently and effectively</p>
+            
+            <div class="nav-links">
+                <a href="/student" class="btn">👨‍🎓 Student Portal</a>
+                <a href="/faculty_login" class="btn btn-secondary">👨‍🏫 Faculty Login</a>
+            </div>
+            
+            <div class="info-box">
+                <strong>Welcome!</strong> Choose your role to continue:
+                <br>• Students can enter their details
+                <br>• Faculty can view and manage records
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+    <script>
+        particlesJS("particles-js", {
+            particles: {
+                number: { value: 80 },
+                size: { value: 4 },
+                move: { speed: 2 },
+                line_linked: { enable: true, distance: 150, opacity: 0.3, color: "#fff" },
+                color: { value: "#ffffff" }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

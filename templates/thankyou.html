@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div id="particles-js"></div>
+    
+    <div class="container">
+        <div class="card animate-fade">
+            <div style="font-size: 3em; margin-bottom: 20px;">✅</div>
+            <h2>Submitted Successfully!</h2>
+            <p class="subtitle">Your data has been saved successfully</p>
+            
+            <div class="success-message">
+                Thank you for submitting your records
+            </div>
+            
+            <a href="/" class="btn" style="width: 100%; text-align: center;">🏠 Back to Home</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+    <script>
+        particlesJS("particles-js", {
+            particles: {
+                number: { value: 80 },
+                size: { value: 4 },
+                move: { speed: 2 },
+                line_linked: { enable: true, distance: 150, opacity: 0.3, color: "#fff" },
+                color: { value: "#ffffff" }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

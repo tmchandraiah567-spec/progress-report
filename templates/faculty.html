@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <div class="container card-wide faculty-container">
+        <div class="faculty-panel">
+            
+            <!-- Top Navigation -->
+            <div class="top-nav faculty-header">
+                <div>
+                    <h1 class="faculty-title">📊 Faculty Dashboard</h1>
+                    <p class="faculty-subtitle">All student marks, subject-wise analysis, and overall performance.</p>
+                </div>
+                <div class="top-actions">
+                    <a href="/faculty" class="btn-secondary">🔄 Refresh</a>
+                    <a href="/clear" class="btn-danger">🗑 Clear All</a>
+                    <a href="/logout" class="btn">🚪 Logout</a>
+                </div>
+            </div>
+
+            <div class="stat-grid">
+                <div class="info-box">
+                    <strong>Overall Student Average</strong>
+                    <p style="margin: 10px 0 0 0; font-size: 1.4em; font-weight: 700; color: #222;">{{ overall_avg and ('%.2f'|format(overall_avg) ~ '%') or 'N/A' }}</p>
+                </div>
+                {% if toppers %}
+                    {% for i, topper in enumerate(toppers) %}
+                    <div class="info-box">
+                        <strong>{% if i == 0 %}🥇 Top 1{% elif i == 1 %}🥈 Top 2{% else %}🥉 Top {{ i + 1 }}{% endif %}</strong>
+                        <p style="margin: 10px 0 0 0; font-size: 1.4em; font-weight: 700; color: #222;">{{ topper['name'] if topper else 'N/A' }}</p>
+                        <p style="margin: 5px 0 0 0; font-size: 0.9em; color: #666;">Avg: {{ topper and ('%.2f'|format(topper['average']) ~ '%') or 'N/A' }}</p>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="filter-panel">
+                <form method="GET" class="filter-form">
+                    <div class="filter-group">
+                        <label for="semester">🎓 Select Semester</label>
+                        <select id="semester" name="semester" required>
+                            <option value="">Choose semester</option>
+                            {% for sem in semesters %}
+                            <option value="{{ sem }}" {% if sem == semester_selected %}selected{% endif %}>Semester {{ sem }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="exam">📝 Select IA</label>
+                        <select id="exam" name="exam" required>
+                            <option value="">Choose IA</option>
+                            {% for exam in exams %}
+                            <option value="{{ exam }}" {% if exam == exam_selected %}selected{% endif %}>{{ exam }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="branch">🏫 Select Branch</label>
+                        <select id="branch" name="branch" required>
+                            <option value="">Choose branch</option>
+                            {% for branch in branches %}
+                            <option value="{{ branch }}" {% if branch == branch_selected %}selected{% endif %}>{{ branch }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="year">📅 Select Year</label>
+                        <select id="year" name="year" required>
+                            <option value="">Choose year</option>
+                            {% for year in years %}
+                            <option value="{{ year }}" {% if year == year_selected %}selected{% endif %}>{{ year }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="top_n">🏆 View Top N</label>
+                        <select id="top_n" name="top_n">
+                            <option value="1" {% if top_n == '1' %}selected{% endif %}>Top 1</option>
+                            <option value="3" {% if top_n == '3' %}selected{% endif %}>Top 3</option>
+                            <option value="5" {% if top_n == '5' %}selected{% endif %}>Top 5</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="rank_style">📌 Rank Style</label>
+                        <select id="rank_style" name="rank_style">
+                            <option value="standard" {% if rank_style == 'standard' %}selected{% endif %}>Standard (1,2,2,4)</option>
+                            <option value="dense" {% if rank_style == 'dense' %}selected{% endif %}>Dense (1,2,2,3)</option>
+                        </select>
+                    </div>
+                    <div class="filter-actions">
+                        <button type="submit" class="btn">Show Records</button>
+                        {% if filters_applied %}
+                        <a href="/faculty" class="btn btn-secondary">Clear Filter</a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+
+            {% if filters_applied %}
+            <div class="selection-summary">
+                <p>Showing records for <strong>Semester {{ semester_selected }}</strong>, <strong>{{ exam_selected }}</strong>, <strong>{{ branch_selected }}</strong>, <strong>{{ year_selected }}</strong>. <strong>{{ total_records }}</strong> students found.</p>
+            </div>
+            {% endif %}
+
+            <!-- Table -->
+            {% if data %}
+            {% if filters_applied %}
+            <div class="student-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th rowspan="2">📌 USN</th>
+                            <th rowspan="2">👤 Name</th>
+                            <th rowspan="2">🎓 Sem</th>
+                            <th rowspan="2">🏫 Branch</th>
+                            <th rowspan="2">📅 Year</th>
+                            <th rowspan="2">📝 Exam</th>
+                            <th colspan="6">📚 Subject Marks (0-25)</th>
+                            <th rowspan="2">📊 Total</th>
+                            <th rowspan="2">📈 Avg</th>
+                            <th rowspan="2">🎯 Grade</th>
+                            <th rowspan="2">🔍 Analyze</th>
+                            <th rowspan="2">✏️ Actions</th>
+                        </tr>
+                        <tr>
+                            {% for i in range(6) %}
+                            <th>{{ subject_column_names[i] if i < subject_column_names|length else 'Subject ' ~ (i + 1) }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in data %}
+                        <tr>
+                            <td>{{ r['usn'] }}</td>
+                            <td class="student-name">{{ r['name'] }}</td>
+                            <td>{{ r['semester'] }}</td>
+                            <td>{{ r['branch'] }}</td>
+                            <td>{{ r['year'] }}</td>
+                            <td>{{ r['exam'] }}</td>
+                            <!-- Dynamic subject marks -->
+                            {% set subjects = r['subjects']|from_json if r['subjects'] else [] %}
+                            {% set marks = r['marks']|from_json if r['marks'] else [] %}
+                            {% for i in range(6) %}
+                                <td>
+                                    {% if i < subjects|length %}
+                                        <span title="{{ subjects[i] }}">{{ marks[i] }}</span>
+                                    {% else %}
+                                        <span>-</span>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                            <td><strong>{{ r['total'] }}</strong></td>
+                            <td><strong style="color:#667eea;">{{ "%.2f"|format(r['average']) }}%</strong></td>
+                            <td>
+                                {% if r['grade'] == 'Distinction' %}
+                                    <span class="grade-badge distinction">{{ r['grade'] }}</span>
+                                {% elif r['grade'] == 'First Class' %}
+                                    <span class="grade-badge first-class">{{ r['grade'] }}</span>
+                                {% elif r['grade'] == 'Pass' %}
+                                    <span class="grade-badge pass">{{ r['grade'] }}</span>
+                                {% else %}
+                                    <span class="grade-badge fail">{{ r['grade'] }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-secondary analyze-btn" data-index="{{ r['df_index'] }}">Analyze</button>
+                            </td>
+                            <td>
+                                <a href="/edit/{{ r['df_index'] }}" class="btn">Edit</a>
+                                <a href="/delete/{{ r['df_index'] }}" class="btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+                {% if filters_applied %}
+                <div class="empty-state">
+                    <p>📭 No matching records found for Semester {{ semester_selected }}, {{ exam_selected }}, {{ branch_selected }}, {{ year_selected }}.</p>
+                    <a href="/faculty" class="btn">← Clear Filter</a>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <p>🎯 Please select semester and IA assessment to load student records.</p>
+                </div>
+                {% endif %}
+            {% endif %}
+            {% endif %}
+
+            <!-- Subject-wise Charts Section -->
+            {% if filters_applied and subject_chart_list %}
+            <div style="margin-top: 40px; padding: 30px; background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); border-radius: 12px;">
+                <h2 style="color: #667eea; margin-bottom: 20px; text-align: center;">📚 Subject Marks (0-25)</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px;">
+                    {% for chart in subject_chart_list %}
+                    <div style="background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: transform 0.3s ease;">
+                        <h3 style="color: #667eea; border-bottom: 2px solid #667eea; padding-bottom: 10px; margin-bottom: 15px;">{{ chart.subject }}</h3>
+                        <div style="height:160px;">
+                            <canvas id="chart-{{ loop.index0 }}"></canvas>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Modal for Student Details -->
+    <div id="studentModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2 id="studentName"></h2>
+                <div class="modal-meta">
+                    <span class="meta-chip">📌 USN: <strong id="studentUSN"></strong></span>
+                    <span class="meta-chip">🎓 Semester: <strong id="studentSemester"></strong></span>
+                    <span class="meta-chip">📝 Exam: <strong id="studentExam"></strong></span>
+                    <span class="meta-chip">🎯 Grade: <strong id="studentGrade"></strong></span>
+                    <span class="meta-chip">📈 Average: <strong id="studentAverage"></strong>%</span>
+                </div>
+            </div>
+            <span id="closeModal" class="modal-close">×</span>
+            <div class="modal-body">
+                <div>
+                    <h3 style="margin-bottom:16px;color:#2e3a61;">📚 Subject Marks</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Marks</th>
+                            </tr>
+                        </thead>
+                        <tbody id="marksTable"></tbody>
+                    </table>
+                </div>
+                <div>
+                    <h3 style="margin-bottom:16px;color:#2e3a61;">📊 Analysis Summary</h3>
+                    <ul id="analysisList" class="analysis-list"></ul>
+                    <div style="margin-top:24px;">
+                        <canvas id="marksChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+    <!-- Subject chart data injected as JSON to avoid JS parser errors in editor -->
+    <script id="subject-data" type="application/json">{{ subject_chart_list|tojson }}</script>
+    <script>
+        particlesJS("particles-js", {
+            particles: {
+                number: { value: 70 },
+                size: { value: 4 },
+                move: { speed: 2 },
+                line_linked: { enable: true, distance: 150, opacity: 0.3, color: "#fff" },
+                color: { value: "#ffffff" }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" }
+                }
+            }
+        });
+
+        let chart = null;
+
+        const showStudentModal = (data) => {
+            document.getElementById('studentName').textContent = data.name;
+            document.getElementById('studentUSN').textContent = data.usn;
+            document.getElementById('studentSemester').textContent = data.semester;
+            document.getElementById('studentExam').textContent = data.exam;
+            document.getElementById('studentGrade').textContent = data.grade;
+            document.getElementById('studentAverage').textContent = data.average.toFixed(2);
+
+            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#8E44AD'];
+            let marksHTML = '';
+            for (let i = 0; i < data.subjects.length; i++) {
+                marksHTML += `<tr style="border-bottom:1px solid #eee;transition:background 0.3s;"><td style="padding:12px;font-weight:500;color:#333;">${data.subjects[i]}</td><td style="padding:12px;"><span style="background:${colors[i]};color:white;padding:6px 12px;border-radius:20px;font-weight:bold;font-size:14px;">${data.marks[i]}</span></td></tr>`;
+            }
+            document.getElementById('marksTable').innerHTML = marksHTML;
+
+            const maxMark = Math.max(...data.marks);
+            const minMark = Math.min(...data.marks);
+            const maxSubject = data.subjects[data.marks.indexOf(maxMark)];
+            const minSubject = data.subjects[data.marks.indexOf(minMark)];
+            const failSubjects = data.subjects.filter((subject, index) => data.marks[index] < 12);
+            const failText = failSubjects.length ? failSubjects.join(', ') : 'None';
+
+            document.getElementById('analysisList').innerHTML = `
+                <li><strong>1.</strong> Student Average: ${data.average.toFixed(2)}%</li>
+                <li><strong>2.</strong> Total Marks: ${data.total}</li>
+                <li><strong>3.</strong> Maximum Marks: ${maxMark} (${maxSubject})</li>
+                <li><strong>4.</strong> Minimum Marks: ${minMark} (${minSubject})</li>
+                <li><strong>5.</strong> Fail Subjects (below 12): ${failText}</li>
+            `;
+
+            if (chart) {
+                chart.destroy();
+            }
+
+            const ctx = document.getElementById('marksChart').getContext('2d');
+            const chartColors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#8E44AD'];
+            const gradients = [];
+
+            for (let i = 0; i < chartColors.length; i++) {
+                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, chartColors[i]);
+                gradient.addColorStop(1, chartColors[i] + '40');
+                gradients.push(gradient);
+            }
+
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.subjects,
+                    datasets: [{
+                        label: 'Marks Obtained',
+                        data: data.marks,
+                        backgroundColor: gradients,
+                        borderColor: chartColors,
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                        hoverBackgroundColor: chartColors,
+                        hoverBorderWidth: 3
+                    }]
+                },
+                options: {
+                    indexAxis: 'x',
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 50,
+                            ticks: {
+                                color: '#666',
+                                font: { size: 12, weight: 'bold' }
+                            },
+                            grid: {
+                                color: 'rgba(200, 200, 200, 0.1)',
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#333',
+                                font: { size: 12, weight: '500' }
+                            },
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                color: '#333',
+                                font: { size: 13, weight: 'bold' },
+                                usePointStyle: true,
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: { size: 14, weight: 'bold' },
+                            bodyFont: { size: 13 },
+                            padding: 12,
+                            borderRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + ' Marks';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('studentModal').style.display = 'block';
+        };
+
+        const loadStudent = (index) => {
+            fetch(`/student_details/${index}`)
+                .then(response => response.json())
+                .then(showStudentModal)
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error loading student details');
+                });
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set background colors for mark badges from data-color attribute
+            document.querySelectorAll('.mark-badge').forEach(badge => {
+                const color = badge.dataset.color;
+                if (color) {
+                    badge.style.background = color;
+                }
+            });
+
+            document.querySelectorAll('.analyze-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const index = button.dataset.index;
+                    if (index !== undefined) {
+                        loadStudent(index);
+                    }
+                });
+            });
+
+            const closeModal = document.getElementById('closeModal');
+            if (closeModal) {
+                closeModal.addEventListener('click', () => {
+                    document.getElementById('studentModal').style.display = 'none';
+                });
+            }
+
+            document.getElementById('studentModal').style.display = 'none';
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('studentModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Render subject charts (prepared server-side)
+        // Load JSON from a non-JS script tag to avoid editor/JS parser errors with template braces
+        (function() {
+            try {
+                const jsonEl = document.getElementById('subject-data');
+                const subjectChartList = jsonEl ? JSON.parse(jsonEl.textContent || '[]') : [];
+                subjectChartList.forEach((item, idx) => {
+                    const data = item;
+                    const canvas = document.getElementById('chart-' + idx);
+                    if (!canvas) return;
+                    const ctx = canvas.getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: 'Marks',
+                                data: data.marks,
+                                backgroundColor: data.colors,
+                                borderRadius: 6
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: { beginAtZero: true, max: 25 }
+                            },
+                            plugins: { legend: { display: false } }
+                        }
+                    });
+                });
+            } catch (e) {
+                console.error('Error rendering subject charts', e);
+            }
+        })();
+    </script>
+</body>
+</html>

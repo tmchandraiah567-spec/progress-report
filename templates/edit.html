@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Student</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div id="particles-js"></div>
+    
+    <div class="container">
+        <div class="card animate-fade">
+            <h2>✏️ Edit Student Record</h2>
+            <p class="subtitle">Update student information</p>
+            
+            <form method="POST" id="editForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="usn">📌 USN <span style="font-size: 0.85em; color: #666;">(Last 3 digits: 001-060)</span></label>
+                        <input type="text" id="usn" name="usn" value="{{s['usn']}}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="name">👤 Name</label>
+                        <input type="text" id="name" name="name" value="{{s['name']}}" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="semester" style="color: #667eea; font-weight: 700; margin: 20px 0 10px 0; display: block;">🎓 Semester</label>
+                        <select id="semester" name="semester" required>
+                            {% for sem in semesters %}
+                            <option value="{{ sem }}" {% if s['semester'] == sem %}selected{% endif %}>Semester {{ sem }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="exam" style="color: #667eea; font-weight: 700; margin: 20px 0 10px 0; display: block;">📝 Assessment</label>
+                        <select id="exam" name="exam" required>
+                            {% for exam in exams %}
+                            <option value="{{ exam }}" {% if s['exam'] == exam %}selected{% endif %}>{{ exam }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="branch" style="color: #667eea; font-weight: 700; margin: 20px 0 10px 0; display: block;">🏫 Branch</label>
+                        <select id="branch" name="branch" required>
+                            {% for branch in branches %}
+                            <option value="{{ branch }}" {% if s['branch'] == branch %}selected{% endif %}>{{ branch }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="year" style="color: #667eea; font-weight: 700; margin: 20px 0 10px 0; display: block;">📅 Year</label>
+                        <select id="year" name="year" required>
+                            {% for year in years %}
+                            <option value="{{ year }}" {% if s['year'] == year %}selected{% endif %}>{{ year }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label style="color: #667eea; font-weight: 700; margin: 20px 0 10px 0; display: block;">📘 Subject Marks (0-25)</label>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sub1">Subject 1</label>
+                        <input type="text" id="sub1" name="sub1" placeholder="Subject name" value="{% if subjects|length > 0 %}{{ subjects[0] }}{% endif %}">
+                    </div>
+                    <div class="form-group">
+                        <label for="m1">Marks</label>
+                        <input type="number" id="m1" name="m1" placeholder="Marks (0-25)" value="{% if marks|length > 0 %}{{ marks[0] }}{% endif %}" min="0" max="25">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sub2">Subject 2</label>
+                        <input type="text" id="sub2" name="sub2" placeholder="Subject name" value="{% if subjects|length > 1 %}{{ subjects[1] }}{% endif %}">
+                    </div>
+                    <div class="form-group">
+                        <label for="m2">Marks</label>
+                        <input type="number" id="m2" name="m2" placeholder="Marks (0-25)" value="{% if marks|length > 1 %}{{ marks[1] }}{% endif %}" min="0" max="25">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sub3">Subject 3</label>
+                        <input type="text" id="sub3" name="sub3" placeholder="Subject name" value="{% if subjects|length > 2 %}{{ subjects[2] }}{% endif %}">
+                    </div>
+                    <div class="form-group">
+                        <label for="m3">Marks</label>
+                        <input type="number" id="m3" name="m3" placeholder="Marks (0-25)" value="{% if marks|length > 2 %}{{ marks[2] }}{% endif %}" min="0" max="25">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sub4">Subject 4</label>
+                        <input type="text" id="sub4" name="sub4" placeholder="Subject name" value="{% if subjects|length > 3 %}{{ subjects[3] }}{% endif %}">
+                    </div>
+                    <div class="form-group">
+                        <label for="m4">Marks</label>
+                        <input type="number" id="m4" name="m4" placeholder="Marks (0-25)" value="{% if marks|length > 3 %}{{ marks[3] }}{% endif %}" min="0" max="25">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sub5">Subject 5</label>
+                        <input type="text" id="sub5" name="sub5" placeholder="Subject name" value="{% if subjects|length > 4 %}{{ subjects[4] }}{% endif %}">
+                    </div>
+                    <div class="form-group">
+                        <label for="m5">Marks</label>
+                        <input type="number" id="m5" name="m5" placeholder="Marks (0-25)" value="{% if marks|length > 4 %}{{ marks[4] }}{% endif %}" min="0" max="25">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sub6">Subject 6</label>
+                        <input type="text" id="sub6" name="sub6" placeholder="Subject name" value="{% if subjects|length > 5 %}{{ subjects[5] }}{% endif %}">
+                    </div>
+                    <div class="form-group">
+                        <label for="m6">Marks</label>
+                        <input type="number" id="m6" name="m6" placeholder="Marks (0-25)" value="{% if marks|length > 5 %}{{ marks[5] }}{% endif %}" min="0" max="25">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn" style="width: 100%; margin-top: 20px;">💾 Update Record</button>
+                <a href="/faculty" style="display: block; text-align: center; margin-top: 15px;">← Back to Faculty Dashboard</a>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+    <script>
+        particlesJS("particles-js", {
+            particles: {
+                number: { value: 80 },
+                size: { value: 4 },
+                move: { speed: 2 },
+                line_linked: { enable: true, distance: 150, opacity: 0.3, color: "#fff" },
+                color: { value: "#ffffff" }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" }
+                }
+            }
+        });
+
+        // Form validation for 5 subjects
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            // Get all subject fields
+            const subjects = [];
+            for (let i = 1; i <= 5; i++) {
+                const subject = document.getElementById(`sub${i}`).value.trim();
+                const marks = document.getElementById(`m${i}`).value.trim();
+                subjects.push({ subject, marks });
+            }
+
+            // Check if at least 4 subjects are filled (5th can be null)
+            let filledCount = 0;
+            for (let i = 0; i < 4; i++) {
+                if (subjects[i].subject && subjects[i].marks) {
+                    filledCount++;
+                }
+            }
+
+            // Alert showing the current 5 subjects state
+            let alertMessage = "📚 Current Subject Entry Status:\n\n";
+            for (let i = 0; i < 5; i++) {
+                const num = i + 1;
+                if (subjects[i].subject && subjects[i].marks) {
+                    alertMessage += `✅ Subject ${num}: ${subjects[i].subject} - ${subjects[i].marks}/25\n`;
+                } else if (i === 4) {
+                    alertMessage += `⚪ Subject ${num}: ${subjects[i].subject ? subjects[i].subject : "(Empty - Optional)"}\n`;
+                } else {
+                    alertMessage += `❌ Subject ${num}: (Empty)\n`;
+                }
+            }
+
+            // Validate: at least first 4 subjects must have both name and marks
+            if (filledCount < 4) {
+                alertMessage += "\n\n⚠️ Please fill at least the first 4 subjects (name and marks).";
+                alert(alertMessage);
+                e.preventDefault();
+                return false;
+            }
+
+            // Show success message with summary
+            alertMessage += "\n\n✅ All required subjects are filled!\nClick OK to update the record.";
+            if (!confirm(alertMessage)) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Entry Form</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div id="particles-js"></div>
+    
+    <div class="container">
+        <div class="card animate-fade">
+            <h2>👨‍🎓 Student Entry Form</h2>
+            <p class="subtitle">Enter your academic details</p>
+            
+            <form method="POST">
+                {% if error %}
+                <div class="form-error">{{ error }}</div>
+                {% endif %}
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="usn">📌 USN <span style="font-size: 0.85em; color: #666;">(Last 3 digits: 001-060)</span></label>
+                        <input type="text" id="usn" name="usn" placeholder="E.g., 1BM21CS001" value="{{ request.form.get('usn', '') }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="name">👤 Name</label>
+                        <input type="text" id="name" name="name" placeholder="Enter your full name" value="{{ request.form.get('name', '') }}" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="semester" style="color: #667eea; font-weight: 700; margin: 20px 0 10px 0; display: block;">🎓 Semester</label>
+                        <select id="semester" name="semester" required>
+                            {% for sem in semesters %}
+                            <option value="{{ sem }}" {% if request.form.get('semester') == sem %}selected{% endif %}>Semester {{ sem }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="exam" style="color: #667eea; font-weight: 700; margin: 20px 0 10px 0; display: block;">📝 Assessment</label>
+                        <select id="exam" name="exam" required>
+                            {% for exam in exams %}
+                            <option value="{{ exam }}" {% if request.form.get('exam') == exam %}selected{% endif %}>{{ exam }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="branch" style="color: #667eea; font-weight: 700; margin: 20px 0 10px 0; display: block;">🏫 Branch</label>
+                        <select id="branch" name="branch" required>
+                            {% for branch in branches %}
+                            <option value="{{ branch }}" {% if request.form.get('branch') == branch %}selected{% endif %}>{{ branch }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="year" style="color: #667eea; font-weight: 700; margin: 20px 0 10px 0; display: block;">📅 Year</label>
+                        <select id="year" name="year" required>
+                            {% for year in years %}
+                            <option value="{{ year }}" {% if request.form.get('year') == year %}selected{% endif %}>{{ year }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label style="color: #667eea; font-weight: 700; margin: 20px 0 10px 0; display: block;">📘 Subject Marks (0-25)</label>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sub1">Subject 1</label>
+                        <input type="text" id="sub1" name="sub1" placeholder="Subject name" value="{{ request.form.get('sub1', '') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="m1">Marks</label>
+                        <input type="number" id="m1" name="m1" placeholder="Marks (0-25)" min="0" max="25" value="{{ request.form.get('m1', '') }}">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sub2">Subject 2</label>
+                        <input type="text" id="sub2" name="sub2" placeholder="Subject name" value="{{ request.form.get('sub2', '') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="m2">Marks</label>
+                        <input type="number" id="m2" name="m2" placeholder="Marks (0-25)" min="0" max="25" value="{{ request.form.get('m2', '') }}">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sub3">Subject 3</label>
+                        <input type="text" id="sub3" name="sub3" placeholder="Subject name" value="{{ request.form.get('sub3', '') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="m3">Marks</label>
+                        <input type="number" id="m3" name="m3" placeholder="Marks (0-25)" min="0" max="25" value="{{ request.form.get('m3', '') }}">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sub4">Subject 4</label>
+                        <input type="text" id="sub4" name="sub4" placeholder="Subject name" value="{{ request.form.get('sub4', '') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="m4">Marks</label>
+                        <input type="number" id="m4" name="m4" placeholder="Marks (0-25)" min="0" max="25" value="{{ request.form.get('m4', '') }}">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sub5">Subject 5</label>
+                        <input type="text" id="sub5" name="sub5" placeholder="Subject name" value="{{ request.form.get('sub5', '') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="m5">Marks</label>
+                        <input type="number" id="m5" name="m5" placeholder="Marks (0-25)" min="0" max="25" value="{{ request.form.get('m5', '') }}">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sub6">Subject 6</label>
+                        <input type="text" id="sub6" name="sub6" placeholder="Subject name" value="{{ request.form.get('sub6', '') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="m6">Marks</label>
+                        <input type="number" id="m6" name="m6" placeholder="Marks (0-25)" min="0" max="25" value="{{ request.form.get('m6', '') }}">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn" style="width: 100%; margin-top: 20px;">✅ Submit</button>
+                <a href="/" style="display: block; text-align: center; margin-top: 15px;">← Back to Home</a>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+    <script>
+        particlesJS("particles-js", {
+            particles: {
+                number: { value: 80 },
+                size: { value: 4 },
+                move: { speed: 2 },
+                line_linked: { enable: true, distance: 150, opacity: 0.3, color: "#fff" },
+                color: { value: "#ffffff" }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

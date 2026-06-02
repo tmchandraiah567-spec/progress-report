@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Login</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div id="particles-js"></div>
+    
+    <div class="container">
+        <div class="card animate-fade">
+            <h2>🔐 Faculty Login</h2>
+            <p class="subtitle">Access the faculty dashboard</p>
+            
+            <form method="POST" action="/faculty_login">
+                {% if error %}
+                <div class="error-message" style="margin-bottom:16px;padding:12px 14px;background:#ffe7e7;border:1px solid #ffb3b3;color:#a32727;border-radius:10px;">
+                    {{ error }}
+                </div>
+                {% endif %}
+                <div class="form-group">
+                    <label for="username">👤 Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">🔑 Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                </div>
+                
+                <button type="submit" class="btn">Login 🚀</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+    <script>
+        // Particles animation
+        particlesJS("particles-js", {
+            particles: {
+                number: { value: 80 },
+                size: { value: 4 },
+                move: { speed: 2 },
+                line_linked: { enable: true, distance: 150, opacity: 0.3, color: "#fff" },
+                color: { value: "#ffffff" }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" }
+                }
+            }
+        });
+
+        // Disable copy-paste in login form for security
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+
+        // Username input - disable copy, paste, cut
+        usernameInput.addEventListener('copy', (e) => {
+            e.preventDefault();
+            alert('⚠️ Copy is disabled for security reasons');
+        });
+        usernameInput.addEventListener('paste', (e) => {
+            e.preventDefault();
+            alert('⚠️ Paste is disabled for security reasons');
+        });
+        usernameInput.addEventListener('cut', (e) => {
+            e.preventDefault();
+        });
+
+        // Password input - disable copy, paste, cut
+        passwordInput.addEventListener('copy', (e) => {
+            e.preventDefault();
+            alert('⚠️ Copy is disabled for security reasons');
+        });
+        passwordInput.addEventListener('paste', (e) => {
+            e.preventDefault();
+            alert('⚠️ Paste is disabled for security reasons');
+        });
+        passwordInput.addEventListener('cut', (e) => {
+            e.preventDefault();
+        });
+    </script>
+</body>
+</html>
