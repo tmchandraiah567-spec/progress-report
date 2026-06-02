@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, redirect, session, jsonify
 import pandas as pd
 import os
 import json
-from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = "secret123"
@@ -104,17 +103,6 @@ def load_df():
 
 def save_df(df):
     try:
-        # create a timestamped backup before overwriting the main file
-        try:
-            backup_dir = os.path.join(os.path.dirname(FILE) or '.', 'backups')
-            os.makedirs(backup_dir, exist_ok=True)
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            backup_fp = os.path.join(backup_dir, f"students_{timestamp}.xlsx")
-            df.to_excel(backup_fp, index=False)
-        except Exception:
-            # backup failure should not block saving the main file
-            pass
-
         df.to_excel(FILE, index=False)
         # Add filters to the Excel sheet
         from openpyxl import load_workbook
@@ -346,9 +334,6 @@ def faculty():
     year_selected = request.values.get('year', '')
     top_n = request.values.get('top_n', '1')  # New parameter for top N selection
     rank_style = request.values.get('rank_style', 'standard')  # ranking style: 'standard' or 'dense'
-    # New filters
-    search = request.values.get('search', '').strip()
-    subject_selected = request.values.get('subject', '').strip().lower()
 
     df = load_df().fillna("")
     filtered = pd.DataFrame(columns=df.columns)
@@ -368,37 +353,9 @@ def faculty():
         filtered = filtered.sort_values(by='usn_number', ascending=True, kind='stable')
         filtered = filtered.drop('usn_number', axis=1)
 
-        # build list of available subjects in this filtered set (canonical keys)
-        available_subjects = set()
-        for subjects_json in filtered['subjects']:
-            try:
-                subs = json.loads(subjects_json)
-                for s in subs:
-                    canon = normalize_subject(s)
-                    if canon:
-                        available_subjects.add(canon)
-            except:
-                pass
-        available_subjects = sorted(available_subjects)
-
-        # Apply subject filter if provided
-        if subject_selected:
-            def has_subject(row):
-                try:
-                    subs = json.loads(row['subjects'])
-                    return any(normalize_subject(s) == subject_selected for s in subs)
-                except:
-                    return False
-            filtered = filtered[filtered.apply(has_subject, axis=1)]
-
-        # Apply text search on USN or name
-        if search:
-            s = search.lower()
-            filtered = filtered[filtered['usn'].fillna('').astype(str).str.lower().str.contains(s) | filtered['name'].fillna('').astype(str).str.lower().str.contains(s)]
-
         if len(filtered) > 0:
             overall_avg = float(filtered['average'].mean())
-
+            
             # Build header names for the subject columns from the first record
             subject_column_names = []
             try:
@@ -461,9 +418,6 @@ def faculty():
         exam_selected=exam_selected,
         branch_selected=branch_selected,
         year_selected=year_selected,
-        search=search,
-        subject_selected=subject_selected,
-        available_subjects=locals().get('available_subjects', []),
         filters_applied=filters_applied,
         total_records=len(filtered),
         top_n=top_n,
